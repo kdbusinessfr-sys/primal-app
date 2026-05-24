@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-[#1A1A1A] px-6">
+    <main className="min-h-screen flex flex-col items-center justify-center bg-[#F5F5F5] px-6">
 
       {/* Halo orange derrière la mascotte */}
       <div className="relative flex items-center justify-center mb-8">
