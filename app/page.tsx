@@ -18,7 +18,7 @@ export default function Home() {
       </div>
 
       {/* Nom + tagline */}
-      <h1 className="text-white text-6xl font-black tracking-tighter mb-2">
+      <h1 className="text-[#1A1A1A] text-6xl font-black tracking-tighter mb-2">
         PRIMAL
       </h1>
       <p className="text-[#FF6B00] text-sm font-semibold tracking-[0.3em] mb-12">
@@ -40,7 +40,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <p className="text-gray-600 text-xs mt-12 tracking-widest">
+      <p className="text-[#9D99AD] text-xs mt-12 tracking-widest">
         primal.velops.fr
       </p>
 
