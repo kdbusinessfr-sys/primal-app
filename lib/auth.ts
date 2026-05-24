@@ -7,12 +7,10 @@ export async function signUp(email: string, password: string, username: string) 
     password,
     options: {
       data: { username },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
     },
   })
-
   if (error) throw error
-
-  // Crée le profil utilisateur dans la table users
   if (data.user) {
     const { error: profileError } = await supabase
       .from('users')
@@ -21,9 +19,8 @@ export async function signUp(email: string, password: string, username: string) 
         email: data.user.email!,
         username,
       })
-    if (profileError) throw profileError
+    if (profileError) console.error('Profile error:', profileError)
   }
-
   return data
 }
 
@@ -43,10 +40,17 @@ export async function signOut() {
   if (error) throw error
 }
 
+// Récupérer la session (plus fiable que getUser)
+export async function getSession() {
+  const { data: { session }, error } = await supabase.auth.getSession()
+  if (error) throw error
+  return session
+}
+
 // Récupérer l'utilisateur connecté
 export async function getCurrentUser() {
   const { data: { user }, error } = await supabase.auth.getUser()
-  if (error) throw error
+  if (error) return null
   return user
 }
 
