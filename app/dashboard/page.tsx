@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { getCurrentUser, getUserProfile, signOut } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
+import { getUserProfile, signOut } from '@/lib/auth'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -11,22 +12,26 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const user = await getCurrentUser()
-        if (!user) {
+    // Ecoute les changements de session en temps réel
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!session) {
           router.push('/')
           return
         }
-        const userProfile = await getUserProfile(user.id)
-        setProfile(userProfile)
-      } catch {
-        router.push('/')
-      } finally {
-        setLoading(false)
+        try {
+          const userProfile = await getUserProfile(session.user.id)
+          setProfile(userProfile)
+        } catch {
+          // Profil pas encore créé — on affiche quand même le dashboard
+          setProfile({ username: session.user.email })
+        } finally {
+          setLoading(false)
+        }
       }
-    }
-    loadUser()
+    )
+
+    return () => subscription.unsubscribe()
   }, [router])
 
   async function handleSignOut() {
@@ -47,7 +52,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-[#F5F5F5] px-6 py-8">
-
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
@@ -59,10 +63,7 @@ export default function DashboardPage() {
             </h1>
           </div>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="text-[#9D99AD] text-sm font-medium"
-        >
+        <button onClick={handleSignOut} className="text-[#9D99AD] text-sm font-medium">
           Déconnexion
         </button>
       </div>
@@ -97,7 +98,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl p-6 shadow-sm flex items-center gap-4 mb-6">
         <Image src="/mascot.svg" alt="Primal" width={64} height={64} />
         <div>
-          <p className="text-[#1A1A1A] font-bold text-sm mb-1">Prêt à transiger ?</p>
+          <p className="text-[#1A1A1A] font-bold text-sm mb-1">Prêt à transpirer ?</p>
           <p className="text-[#9D99AD] text-xs">
             Enregistre ta première activité et commence à sentir le dard 🦂
           </p>
@@ -108,7 +109,6 @@ export default function DashboardPage() {
       <button className="btn-primary w-full text-lg">
         + Ajouter une activité
       </button>
-
     </main>
   )
 }
